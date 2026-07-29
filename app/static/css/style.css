@@ -1,0 +1,322 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:font-family:'Poppins',sans-serif;
+    background:#f7f5ef;
+    color:#2d3436;
+}
+
+
+/* ================= NAVBAR ================= */
+
+.navbar{
+    background:#0F5C78;
+    border-bottom:4px solid #C49B3D;
+    padding:10px 40px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+}
+
+.brand-text h1{
+    color:#fff;
+    font-size:36px;
+    font-weight:700;
+    letter-spacing:2px;
+    margin:0;
+}
+
+.brand-text h2{
+    color:#F4D58D;
+    font-size:18px;
+    font-weight:500;
+    margin:4px 0;
+}
+
+.brand-line{
+    width:90px;
+    height:2px;
+    background:#C49B3D;
+    margin:8px 0;
+}
+
+.brand-text p{
+    color:rgba(255,255,255,.85);
+    font-size:13px;
+    letter-spacing:1px;
+    margin:0;
+}
+/* ================= LAYOUT ================= */
+
+
+.container{
+    display:flex;
+    height:calc(100vh - 70px);
+}
+
+.sidebar{
+    width:380px;
+    background:white;
+    padding:25px;
+    overflow-y:auto;
+    box-shadow:5px 0 18px rgba(0,0,0,.08);
+}
+
+.map-section{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+}
+
+.map-header{
+    margin-bottom:15px;
+}
+
+.map-header h2{
+    color:#0F5C78;
+    font-size:28px;
+    margin-bottom:5px;
+}
+
+.map-header p{
+    color:#666;
+    font-size:15px;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    width:380px;
+    background:white;
+    padding:25px;
+    overflow-y:auto;
+    box-shadow:5px 0 18px rgba(0,0,0,.08);
+}
+
+.sidebar h2{
+
+    color:#0f5c78;
+    margin-bottom:20px;
+    font-size:28px;
+
+}
+
+.sidebar h3{
+
+    color:#0f5c78;
+    margin-bottom:15px;
+
+}
+
+.sidebar input{
+
+    width:100%;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+    margin-bottom:15px;
+}
+
+.sidebar input:focus{
+
+    border-color:#0f5c78;
+
+}
+
+.sidebar button{
+
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    background:#0f5c78;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.sidebar button:hover{
+
+    background:#0b495f;
+
+}
+
+#locationBtn{
+
+    background:#4f7942;
+
+}
+
+#locationBtn:hover{
+
+    background:#3f6134;
+
+}
+
+hr{
+
+    border:none;
+    height:1px;
+    background:#ececec;
+    margin:25px 0;
+
+}
+
+/* ================= CARD ================= */
+
+.card{
+
+    background:white;
+    border-radius:15px;
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    border-left:5px solid #c49b3d;
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.card h4{
+
+    color:#0f5c78;
+    margin-bottom:10px;
+    font-size:21px;
+
+}
+
+.card p{
+
+    margin-bottom:8px;
+    line-height:1.5;
+
+}
+
+.routeBtn{
+
+    margin-top:10px;
+    background:#0f5c78 !important;
+
+}
+
+.routeBtn:hover{
+
+    background:#0b495f !important;
+
+}
+
+/* ================= MAP ================= */
+
+#map{
+    flex:1;
+    width:100%;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+/* ================= SCROLL ================= */
+
+.sidebar::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+
+    background:#c49b3d;
+    border-radius:20px;
+
+}
+
+.sidebar::-webkit-scrollbar-track{
+
+    background:#eee;
+
+}
+
+.place-title{
+
+    font-size:24px;
+    font-weight:700;
+    color:#0f5c78;
+    margin-bottom:18px;
+
+}
+
+.info-row{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin:12px 0;
+
+    font-size:15px;
+
+}
+
+.label{
+
+    font-weight:600;
+    color:#0f5c78;
+
+}
+
+.info-address{
+
+    margin-top:18px;
+
+}
+
+.info-address p{
+
+    margin-top:8px;
+    color:#555;
+    line-height:1.7;
+
+}
+
+.routeBtn{
+
+    margin-top:20px;
+    height:48px;
+
+    font-weight:600;
+
+    border-radius:10px;
+
+}
+
+/* ===========================
+   Sidebar HOLIBANG
+=========================== */
+
+.sidebar h2{
+    color:#0F5C78;
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.sidebar-desc{
+    color:#666;
+    font-size:14px;
+    line-height:1.6;
+    margin-bottom:20px;
+}

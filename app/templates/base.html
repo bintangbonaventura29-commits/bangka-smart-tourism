@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        HOLIBANG | Holiday Bangka
+        {% endblock %}
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+    <!-- Leaflet Routing Machine -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="brand">
+        <div class="brand-text">
+            <h1>HOLIBANG</h1>
+            <h2>Holiday Bangka</h2>
+            <div class="brand-line"></div>
+            <p>Explore. Discover. Enjoy.</p>
+        </div>
+    </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Leaflet Routing Machine -->
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+{% block script %}
+{% endblock %}
+
+</body>
+</html>
