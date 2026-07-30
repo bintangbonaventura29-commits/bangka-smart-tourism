@@ -1,5 +1,6 @@
 import pickle
 from pathlib import Path
+import pandas as pd
 
 # ==========================
 # Load Model
@@ -68,7 +69,7 @@ def recommend(place_name, top_n=5):
         rekomendasi.append({
             "name": df.iloc[i]["name"],
             "type": df.iloc[i]["type"],
-            "rating": df.iloc[i]["rating"],
+            "rating": "-" if pd.isna(df.iloc[i]["rating"]) else df.iloc[i]["rating"],
             "address": df.iloc[i]["address"],
             "latitude": df.iloc[i]["latitude"],
             "longitude": df.iloc[i]["longitude"],
