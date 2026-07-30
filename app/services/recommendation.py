@@ -1,31 +1,4 @@
-import pickle
-from pathlib import Path
 import pandas as pd
-
-# ==========================
-# Load Model
-# ==========================
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-MODEL_DIR = BASE_DIR / "models"
-
-with open(MODEL_DIR / "dataset.pkl", "rb") as f:
-    df = pickle.load(f)
-
-with open(MODEL_DIR / "tfidf.pkl", "rb") as f:
-    tfidf = pickle.load(f)
-
-with open(MODEL_DIR / "cosine_similarity.pkl", "rb") as f:
-    cosine_sim = pickle.load(f)
-
-print("Model AI berhasil dimuat.")
-print("Jumlah data :", len(df))
-print("Kolom :", df.columns.tolist())
-
-
-# ==========================
-# Fungsi Rekomendasi
-# ==========================
 
 def recommend(place_name, top_n=5):
 
@@ -59,17 +32,27 @@ def recommend(place_name, top_n=5):
         reverse=True
     )
 
-    # Ambil 5 hasil termasuk dirinya sendiri
+    # Ambil top_n termasuk dirinya sendiri
     sim_scores = sim_scores[:top_n]
 
     rekomendasi = []
 
     for i, score in sim_scores:
 
+        rating = df.iloc[i]["rating"]
+
+        # Jika rating kosong, NaN, atau tulisan "nan"
+        if (
+            pd.isna(rating)
+            or str(rating).strip().lower() == "nan"
+            or str(rating).strip() == ""
+        ):
+            rating = "-"
+
         rekomendasi.append({
             "name": df.iloc[i]["name"],
             "type": df.iloc[i]["type"],
-            "rating": "-" if pd.isna(df.iloc[i]["rating"]) else df.iloc[i]["rating"],
+            "rating": rating,
             "address": df.iloc[i]["address"],
             "latitude": df.iloc[i]["latitude"],
             "longitude": df.iloc[i]["longitude"],
