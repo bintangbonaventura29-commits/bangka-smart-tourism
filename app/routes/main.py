@@ -3,6 +3,7 @@ from app.services.recommendation import recommend, df
 
 main = Blueprint("main", __name__)
 
+
 @main.route("/", methods=["GET", "POST"])
 def home():
 
@@ -12,18 +13,51 @@ def home():
 
     if request.method == "POST":
 
-        selected_place = request.form.get("place_name")
+        selected_place = request.form.get("place_name", "").strip()
 
         if selected_place:
 
+            keyword = selected_place.lower()
+
+            # ======================================
+            # 1. Exact Match
+            # ======================================
             hasil = df[
-                df["name"].str.lower() == selected_place.lower()
+                df["name"].str.lower() == keyword
             ]
 
+            # ======================================
+            # 2. Partial Match Nama
+            # ======================================
+            if hasil.empty:
+
+                hasil = df[
+                    df["name"].str.lower().str.contains(keyword, na=False)
+                ]
+
+            # ======================================
+            # 3. Match Berdasarkan Kategori (Type)
+            # ======================================
+            if hasil.empty:
+
+                hasil = df[
+                    df["type"].str.lower().str.contains(keyword, na=False)
+                ]
+
+            # ======================================
+            # Jika ditemukan
+            # ======================================
             if not hasil.empty:
+
                 place = hasil.iloc[0]
 
-            recommendations = recommend(selected_place)
+                # gunakan nama destinasi hasil pencarian
+                recommendations = recommend(selected_place)
+
+            else:
+
+                # fallback ke fuzzy search di recommendation.py
+                recommendations = recommend(selected_place)
 
     return render_template(
         "index.html",

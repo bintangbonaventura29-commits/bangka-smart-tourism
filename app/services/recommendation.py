@@ -1,68 +1,192 @@
+import pickle
 import pandas as pd
+from rapidfuzz import process, fuzz
 
-def recommend(place_name, top_n=5):
+with open("app/models/master.pkl","rb") as f:
+    df = pickle.load(f)
 
-    print("\n===================================")
-    print("Pencarian :", place_name)
+with open("app/models/tfidf.pkl","rb") as f:
+    tfidf = pickle.load(f)
 
-    hasil = df[
-        df["name"].str.lower().str.contains(
-            place_name.lower(),
-            na=False
-        )
-    ]
+with open("app/models/cosine_sim.pkl","rb") as f:
+    similarity = pickle.load(f)
 
-    print("Jumlah hasil pencarian :", len(hasil))
+df["name"] = df["name"].astype(str)
+df["content"] = df["content"].astype(str)
 
-    if hasil.empty:
-        print("Destinasi tidak ditemukan.")
+def recommend(query, top_n=5):
+
+    if not query:
         return []
 
-    idx = hasil.index[0]
+    keyword = query.lower().strip()
 
-    print("Index ditemukan :", idx)
-    print("Nama :", df.iloc[idx]["name"])
+    # =====================================================
+    # 1. Exact Match
+    # =====================================================
 
-    # Hitung similarity
-    sim_scores = list(enumerate(cosine_sim[idx]))
+    exact = df[
+        df["name"].str.lower() == keyword
+    ]
 
-    sim_scores = sorted(
-        sim_scores,
-        key=lambda x: x[1],
-        reverse=True
+    if not exact.empty:
+
+        idx = exact.index[0]
+
+        sim_scores = list(enumerate(similarity[idx]))
+
+        sim_scores = sorted(
+            sim_scores,
+            key=lambda x: x[1],
+            reverse=True
+        )[1:top_n+1]
+
+        hasil = []
+
+        for i, score in sim_scores:
+
+            row = df.iloc[i]
+
+            hasil.append({
+
+                "name": row["name"],
+                "type": row["type"],
+                "rating": row["rating"] if pd.notna(row["rating"]) else "-",
+                "address": row["address"],
+                "latitude": row["latitude"],
+                "longitude": row["longitude"],
+                "image": row["image"],
+                "similarity": round(score * 100, 2),
+                "selected": False
+
+            })
+
+        return hasil
+
+    # =====================================================
+    # 2. Cari keyword pada NAME
+    # Contoh:
+    # pantai
+    # bukit
+    # museum
+    # air terjun
+    # =====================================================
+
+    hasil = (
+    df[
+        df["name"].str.lower().str.contains(keyword, na=False)
+    ]
+    .sort_values(
+        by="rating",
+        ascending=False,
+        na_position="last"
+    )
+    .head(top_n)
+)
+
+    if not hasil.empty:
+
+        data = []
+
+        for _, row in hasil.iterrows():
+
+            data.append({
+
+                "name": row["name"],
+                "type": row["type"],
+                "rating": row["rating"] if pd.notna(row["rating"]) else "-",
+                "address": row["address"],
+                "latitude": row["latitude"],
+                "longitude": row["longitude"],
+                "image": row["image"],
+                "similarity": 0,
+                "selected": False
+
+            })
+
+        return data
+
+    # =====================================================
+    # 3. Cari keyword pada CONTENT
+    # =====================================================
+
+    hasil = (
+    df[
+        df["content"].str.lower().str.contains(keyword, na=False)
+    ]
+    .sort_values(
+        by="rating",
+        ascending=False,
+        na_position="last"
+    )
+    .head(top_n)
+)
+    if not hasil.empty:
+
+        data = []
+
+        for _, row in hasil.iterrows():
+
+            data.append({
+
+                "name": row["name"],
+                "type": row["type"],
+                "rating": row["rating"] if pd.notna(row["rating"]) else "-",
+                "address": row["address"],
+                "latitude": row["latitude"],
+                "longitude": row["longitude"],
+                "image": row["image"],
+                "similarity": 0,
+                "selected": False
+
+            })
+
+        return data
+
+    # =====================================================
+    # 4. RapidFuzz
+    # =====================================================
+
+    match = process.extractOne(
+        keyword,
+        df["name"].str.lower(),
+        scorer=fuzz.WRatio
     )
 
-    # Ambil top_n termasuk dirinya sendiri
-    sim_scores = sim_scores[:top_n]
+    if match:
 
-    rekomendasi = []
+        idx = df[
+            df["name"].str.lower() == match[0]
+        ].index[0]
 
-    for i, score in sim_scores:
+        sim_scores = list(enumerate(similarity[idx]))
 
-        rating = df.iloc[i]["rating"]
+        sim_scores = sorted(
+            sim_scores,
+            key=lambda x: x[1],
+            reverse=True
+        )[1:top_n+1]
 
-        # Jika rating kosong, NaN, atau tulisan "nan"
-        if (
-            pd.isna(rating)
-            or str(rating).strip().lower() == "nan"
-            or str(rating).strip() == ""
-        ):
-            rating = "-"
+        hasil = []
 
-        rekomendasi.append({
-            "name": df.iloc[i]["name"],
-            "type": df.iloc[i]["type"],
-            "rating": rating,
-            "address": df.iloc[i]["address"],
-            "latitude": df.iloc[i]["latitude"],
-            "longitude": df.iloc[i]["longitude"],
-            "image": df.iloc[i]["image"],
-            "similarity": round(float(score), 4),
-            "selected": (i == idx)
-        })
+        for i, score in sim_scores:
 
-    print("Rekomendasi:")
-    for item in rekomendasi:
-        print("-", item["name"], item["similarity"])
+            row = df.iloc[i]
 
-    return rekomendasi
+            hasil.append({
+
+                "name": row["name"],
+                "type": row["type"],
+                "rating": row["rating"] if pd.notna(row["rating"]) else "-",
+                "address": row["address"],
+                "latitude": row["latitude"],
+                "longitude": row["longitude"],
+                "image": row["image"],
+                "similarity": round(score * 100, 2),
+                "selected": False
+
+            })
+
+        return hasil
+
+    return []

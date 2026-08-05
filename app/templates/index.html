@@ -10,7 +10,7 @@ Home
 
     <div class="sidebar">
 
-        <h2>Cari Destinasi</h2>
+        <h2>Cari Destinasi Wisata</h2>
 
         <form method="POST">
 
@@ -46,10 +46,13 @@ Home
              data-lng="{{ item.longitude }}">
 
             <h4 class="place-title">
+
                 {% if item.selected %}
-                    📍
+                📍
                 {% endif %}
+
                 {{ item.name }}
+
             </h4>
 
             <div class="info-row">
@@ -64,7 +67,13 @@ Home
 
             <div class="info-row">
                 <span class="label">Similarity</span>
-                <span>{{ "%.2f"|format(item.similarity * 100) }}%</span>
+
+                {% if item.similarity == 0 %}
+                    <span>-</span>
+                {% else %}
+                    <span>{{ item.similarity }}%</span>
+                {% endif %}
+
             </div>
 
             <div class="info-address">
@@ -89,11 +98,17 @@ Home
     </div>
 
     <!-- MAP -->
+
     <div class="map-section">
 
         <div class="map-header">
+
             <h2>Peta Destinasi Wisata</h2>
-            <p>Lihat lokasi dan rute menuju destinasi pilihan Anda.</p>
+
+            <p>
+                Lihat lokasi destinasi wisata dan rute menuju lokasi.
+            </p>
+
         </div>
 
         <div id="map"></div>
@@ -117,7 +132,7 @@ L.tileLayer(
 }).addTo(map);
 
 var userMarker;
-var routingControl = null;
+var routingControl=null;
 
 document.getElementById("locationBtn").onclick=function(){
 
@@ -134,9 +149,10 @@ document.getElementById("locationBtn").onclick=function(){
                 map.removeLayer(userMarker);
             }
 
-            userMarker=L.marker([lat,lng]).addTo(map);
-
-            userMarker.bindPopup("Lokasi Saya").openPopup();
+            userMarker=L.marker([lat,lng])
+            .addTo(map)
+            .bindPopup("Lokasi Saya")
+            .openPopup();
 
         });
 
@@ -144,11 +160,45 @@ document.getElementById("locationBtn").onclick=function(){
 
 };
 
+
+// ==============================
+// Marker destinasi yang dipilih
+// ==============================
+{% if place is not none and place["latitude"] and place["longitude"] %}
+
+var selectedMarker = L.marker([
+{{ place.latitude }},
+{{ place.longitude }}
+],{
+    icon: L.icon({
+        iconUrl:"https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+        shadowUrl:"https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize:[25,41],
+        iconAnchor:[12,41],
+        popupAnchor:[1,-34],
+        shadowSize:[41,41]
+    })
+}).addTo(map);
+
+selectedMarker.bindPopup(`
+<b>{{ place.name }}</b><br>
+Jenis : {{ place.type }}<br>
+Rating : {{ place.rating }}<br><br>
+<button onclick="buatRute({{ place.latitude }},{{ place.longitude }})">
+🧭 Rute ke Lokasi
+</button>
+`).openPopup();
+
+map.setView([{{ place.latitude }},{{ place.longitude }}],15);
+
+{% endif %}
+
 var destinationMarkers=[];
+
 
 {% for item in recommendations %}
 
-{% if item.latitude != 0 and item.longitude != 0 %}
+{% if item.latitude and item.longitude %}
 
 var marker=L.marker([
 {{ item.latitude }},
@@ -159,7 +209,13 @@ marker.bindPopup(`
 <b>{{ item.name }}</b><br>
 Jenis : {{ item.type }}<br>
 Rating : {{ item.rating }}<br>
-Similarity : {{ "%.2f"|format(item.similarity*100) }}%
+
+{% if item.similarity == 0 %}
+Similarity : -
+{% else %}
+Similarity : {{ item.similarity }}%
+{% endif %}
+
 `);
 
 destinationMarkers.push(marker);
@@ -222,6 +278,42 @@ document.querySelectorAll(".routeBtn").forEach(function(btn){
     });
 
 });
+
+
+function buatRute(destLat,destLng){
+
+    navigator.geolocation.getCurrentPosition(function(position){
+
+        var userLat = position.coords.latitude;
+        var userLng = position.coords.longitude;
+
+        if(userMarker){
+            map.removeLayer(userMarker);
+        }
+
+        userMarker = L.marker([userLat,userLng])
+            .addTo(map)
+            .bindPopup("Lokasi Saya")
+            .openPopup();
+
+        if(routingControl){
+            map.removeControl(routingControl);
+        }
+
+        routingControl = L.Routing.control({
+            waypoints:[
+                L.latLng(userLat,userLng),
+                L.latLng(destLat,destLng)
+            ],
+            routeWhileDragging:false,
+            draggableWaypoints:false,
+            addWaypoints:false,
+            show:false
+        }).addTo(map);
+
+    });
+
+}
 
 </script>
 
